@@ -1,0 +1,186 @@
+\ProvidesFile{harvardagps.cbx}
+[2024/03/16 v1.0 biblatex citation style]
+
+% ========================================================================
+% Harvard AGPS BibLaTeX Style
+%
+% Providing style, configuration, tests, and examples.
+% Repository: https://github.com/harvardagps/HarvardAGPS
+% ========================================================================
+%% Copyright 2024 Gavin Kromhout
+%
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.3
+% of this license or (at your option) any later version.
+% The latest version of this license is in
+%   https://www.latex-project.org/lppl.txt
+% and version 1.3c or later is part of all distributions of LaTeX
+% version 2008 or later.
+%
+% This work has the LPPL maintenance status `maintained'.
+% This work consists of all files listed in the repository.
+% ========================================================================
+%% Usage
+%
+% 1. set biblatex as the only bibliography package in your .tex document:
+%
+%     \usepackage[style=harvardagps]{biblatex}
+%     \addbibresource{your.bib}
+%     ...
+%     \newpage
+%     \printbibliography[heading=bibintoc]
+%
+% 2. place copies of harvardagps.bbx and harvardagps.cbx in the same
+%    directory as the .tex document above.
+%
+% For details of each option see the BibLaTeX package documentation 
+% e.g. $ texdoc biblatex
+%
+% WARNING: any malformatting in this file will likely cause a .tex 
+% document build to fail badly.
+%
+% In the comments below, `the guide' refers to the 
+% University of Southern Queensland Harvard AGPS Referencing Guide (2020).
+%
+% DISCLAIMER: This work is independent and has in no way been endorsed
+%             by the University of Southern Queensland. This work is 
+%             provided `as is' under the stated license.
+% ========================================================================
+
+% Require, and build on top of the standard authoryear-comp style.
+% This citation style is a compact variant of the authoryear style.
+% It reduces author name duplication in single cite commands as per the guide. 
+\RequireCitationStyle{authoryear-comp}
+
+\ExecuteBibliographyOptions{
+    sortcites=true, % See: `In-text citation' in the guide, list works alphabetically by author in a multi-citation.
+    maxcitenames=3, % See: `MORE THAN THREE AUTHORS' in the guide, for more than three authors use First et al. in citations.
+    mincitenames=1, % See: `MORE THAN THREE AUTHORS' in the guide, for more than three authors use First et al. in citations.
+    uniquename=init % Here to prevent warnings - because authoryear.cbx executes `uniquename' i.e. `=full' option.
+}
+
+% Use ampersand (&) between the final two author names when in parentheses as per the guide.
+% Leaving 'and' to be use by \textcite in sentences as per the guide.
+% Default: \bibstring{and} <- a language definition which is widely used and best to leave alone.
+% Default: \bibstring{and} <- is replaced with \& below.
+% Here the context sensitive format is set; \autocite is set to use \parencite so works for both.
+\DeclareDelimFormat[parencite]{finalnamedelim}{\addspace\&\space}
+
+% Delimiter used when compressing author names.
+\renewcommand*{\compcitedelim}{\addsemicolon\space}
+
+% Sentence case coversion for citetitle used in \textcite.
+\DeclareFieldFormat{citetitle}{\mkbibemph{\MakeSentenceCase*{#1}}}
+
+% Initials after family name (family-given), when name is not unique (disambiguation).
+% This name format (labelname) is used in \cite in authoryear-comp and therefore in
+%   \parencite and finally therefore by \autocite.
+% Default is in biblatex.def.
+\DeclareNameFormat{labelname}{%
+    \ifcase\value{uniquename}%
+    \usebibmacro{name:family}
+    {\namepartfamily}
+    {\namepartgiven}
+    {\namepartprefix}
+    {\namepartsuffix}%
+    \or
+    \ifuseprefix
+        {\usebibmacro{name:family-given}
+        {\namepartfamily}
+        {\namepartgiveni}
+        {\namepartprefix}
+        {\namepartsuffixi}}
+        {\usebibmacro{name:family-given}
+        {\namepartfamily}
+        {\namepartgiveni}
+        {\namepartprefixi}
+        {\namepartsuffixi}}%
+    \or
+        \usebibmacro{name:family-given}
+        {\namepartfamily}
+        {\namepartgiven}
+        {\namepartprefix}
+        {\namepartsuffix}%
+    \fi
+    \usebibmacro{name:andothers}}
+
+% Now declare a name format under a new name, but with the default behaviour,
+%   so that \textcite can be renewed to use it.
+% Default is in biblatex.def.
+\DeclareNameFormat{labelnameTextCite}{%
+    \ifcase\value{uniquename}%
+    \usebibmacro{name:family}
+    {\namepartfamily}
+    {\namepartgiven}
+    {\namepartprefix}
+    {\namepartsuffix}%
+    \or
+    \ifuseprefix
+        {\usebibmacro{name:given-family}
+        {\namepartfamily}
+        {\namepartgiveni}
+        {\namepartprefix}
+        {\namepartsuffixi}}
+        {\usebibmacro{name:given-family}
+        {\namepartfamily}
+        {\namepartgiveni}
+        {\namepartprefixi}
+        {\namepartsuffixi}}%
+    \or
+        \usebibmacro{name:given-family}
+        {\namepartfamily}
+        {\namepartgiven}
+        {\namepartprefix}
+        {\namepartsuffix}%
+    \fi
+    \usebibmacro{name:andothers}}
+
+% Renew \textcite to use labelnameTextCite.
+% Default is in authoryear-comp.cbx
+\renewbibmacro*{textcite}{%
+    \iffieldequals{namehash}{\cbx@lasthash}
+    {\iffieldundef{shorthand}
+        {\ifthenelse{\iffieldequals{labelyear}{\cbx@lastyear}\AND
+                \(\value{multicitecount}=0\OR\iffieldundef{postnote}\)}
+            {\setunit{\addcomma}%
+                \usebibmacro{cite:extradate}}
+            {\setunit{\compcitedelim}%
+                \usebibmacro{cite:labeldate+extradate}%
+                \savefield{labelyear}{\cbx@lastyear}}}
+        {\setunit{\compcitedelim}%
+            \usebibmacro{cite:shorthand}%
+            \global\undef\cbx@lastyear}}
+    {\ifnameundef{labelname}
+        {\iffieldundef{shorthand}
+            {\usebibmacro{cite:label}%
+                \setunit{%
+                    \global\booltrue{cbx:parens}%
+                    \printdelim{nonameyeardelim}\bibopenparen}%
+                \ifnumequal{\value{citecount}}{1}
+                {\usebibmacro{prenote}}
+                {}%
+                \usebibmacro{cite:labeldate+extradate}}
+            {\usebibmacro{cite:shorthand}}}
+        {\printnames[labelnameTextCite]{labelname}%
+            \setunit{%
+                \global\booltrue{cbx:parens}%
+                \printdelim{nameyeardelim}\bibopenparen}%
+            \ifnumequal{\value{citecount}}{1}
+            {\usebibmacro{prenote}}
+            {}%
+            \iffieldundef{shorthand}
+            {\iffieldundef{labelyear}
+                {\usebibmacro{cite:label}}
+                {\usebibmacro{cite:labeldate+extradate}}%
+                \savefield{labelyear}{\cbx@lastyear}}
+            {\usebibmacro{cite:shorthand}%
+                \global\undef\cbx@lastyear}}%
+        \stepcounter{textcitecount}%
+        \savefield{namehash}{\cbx@lasthash}}%
+    \setunit{%
+        \ifbool{cbx:parens}
+        {\bibcloseparen\global\boolfalse{cbx:parens}}
+        {}%
+        \textcitedelim}}
+
+\endinput

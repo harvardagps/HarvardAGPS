@@ -1,0 +1,844 @@
+% ====================================================================
+% Harvard AGPS BibLaTeX Style
+%
+% Providing style, configuration, tests, and examples.
+% Repository: https://github.com/harvardagps/HarvardAGPS
+% ====================================================================
+%% Copyright 2024 Gavin Kromhout
+%
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.3
+% of this license or (at your option) any later version.
+% The latest version of this license is in
+%   https://www.latex-project.org/lppl.txt
+% and version 1.3c or later is part of all distributions of LaTeX
+% version 2008 or later.
+%
+% This work has the LPPL maintenance status `maintained'.
+% This work consists of all files listed in the repository.
+% ====================================================================
+% DISCLAIMER: This work is independent and has in no way been endorsed
+%             by the University of Southern Queensland. This work is 
+%             provided `as is' under the stated license.
+% ====================================================================
+
+% Load the document class and set the paper size and font size.
+\documentclass[a4paper, 11pt]{article}
+
+% Not using, here as an example only.
+% \usepackage{harvard}
+% \bibliographystyle{agsm}
+
+% Not using, here as an example only.
+% \usepackage{natbib}
+% \usepackage{har2nat}
+% \bibliographystyle{agsm}
+
+% Use the BibLaTeX package for the citations and reference list.
+% See the harvardagps.bbx and harvardagps.cbx style files for full details.
+% IMPORTANT: The `biber' program must also be installed, perhaps additionally to LaTeX.
+% IMPORTANT: BibLaTeX and `biber' must be version compatible with each other.
+\usepackage[style=harvardagps]{biblatex}
+\addbibresource{agps.bib}
+% \addbibresource{biblatex-examples.bib}
+% \addbibresource{xampl.bib}
+
+% Make typography beautiful.
+\usepackage{microtype}
+
+% Remove unnecessary indentation.
+\usepackage{noindentafter}
+\NoIndentAfterEnv{itemize}
+\NoIndentAfterEnv{enumerate}
+\NoIndentAfterEnv{verbatim}
+
+% Colour!
+\usepackage[dvipsnames]{xcolor}
+
+% Headers, footers, and page numbers.
+\usepackage{pageslts}
+\usepackage{fancyhdr}
+% Redefine the plain page style.
+% Notes:
+% The first pages of commands like \chapter (book & report classes) call \thispagestyle{plain}.
+% The first page of the article class does so too when \maketitle is used.
+% The first page of table of contents and other indexes may do so too.
+% In any case, a \pagestyle{plain} call is required to set the page style `from now on'.
+\fancypagestyle{plain}{%
+    \fancyhf{}% clear all header and footer fields
+    \fancyfoot[C]{\thepage~of~\lastpageref*{LastPage}} % page of pages
+    \renewcommand{\headrulewidth}{0pt}%
+    \renewcommand{\footrulewidth}{0pt}%
+}
+\pagestyle{plain}
+
+% Load these packages as late as possible and in this order,
+% i.e. after most other packages.
+\usepackage[hidelinks]{hyperref}
+\urlstyle{same}
+\usepackage{cleveref}
+
+% Define commands.
+\newcommand*{\repobaseurl}{https://github.com/harvardagps/HarvardAGPS}
+\newcommand*{\BibTeX}{{\sc Bib}\TeX}
+\newcommand*{\BibLaTeX}{Bib\LaTeX}
+\newcommand*{\refNameNum}[1]{%
+    \hyperref[#1]{\nameref*{#1}~\ref*{#1}}%
+}
+% These custom commands should not be needed in a typical paper.
+% They assist with beginning and ending refsection to print a Reference per subsection. 
+\newcommand*{\subsectionRefSection}[1]{
+    \subsection{#1}
+    \refsection
+}
+\newcommand*{\printsubbibliographyEndRefSection}{
+    \printbibliography[heading=subbibliography, title=Reference]
+    \endrefsection
+}
+
+% Define environments.
+\newenvironment{agpsExample}{
+    \setlength{\parindent}{0pt}
+    \medskip
+}
+{}
+\NoIndentAfterEnv{agpsExample}
+
+\newenvironment{bareList}{%
+    \begin{list}{}{}%
+}
+{\end{list}}
+
+% Setup metadata.
+\title{Harvard AGPS \BibLaTeX\ Style}
+\author{Gavin Kromhout}
+\date{2024/03/16 v1.0}
+
+% Let's go.
+\begin{document}
+
+% Set page numbering scheme.
+% May be used to switch numbering schemes throughout the document.
+% Highly recommended after \begin{document} for the pageslts package.
+\pagenumbering{arabic}
+
+%%%%%%%%%%
+\maketitle
+%%%%%%%%%%
+
+\begin{center}
+    {\color{Magenta} \url{\repobaseurl}}
+\end{center}
+
+%%%%%%%%%%%%%%%%
+\tableofcontents
+%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%
+\subsection{About}
+%%%%%%%%%%%%%%%%%%
+
+This repository presents a solution in \cref{subsec:Solution}, using \BibLaTeX, to the challenge of
+citation and referencing in the Harvard AGPS style.
+
+This repository exists because it was the most certain way that I could see to make a long list of
+references exactly match the \emph{University of Southern Queensland Harvard AGPS Referencing Guide}
+\autocite{UniSQ2020HarvarAGPSRefere}, henceforth The Guide. The aim is to fully and correctly
+represent the citation and reference examples from the aforementioned referencing guide, and thus
+validate and provide confidence that the configuration works correctly.
+
+The long list of references, mentioned previously, came about due to selecting to write a
+dissertation for my Bachelor of Engineering (Honours) degree that was of the \emph{literature review
+    as a research methodology} type. Hence a large document with many references and it made sense to
+use \LaTeX\ with \BibTeX\ (more on how that became \BibLaTeX\ is discussed in the alternatives
+\namecref{subsec:Alternatives}, but I also needed a custom database for the literature search log
+and \BibLaTeX\ also has that super power).
+
+Finally, an internet search for a suitable Harvard AGPS bibliography / referencing style returned
+only a few uncertain results, thus this effort may prove valuable to others.
+
+%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Solution}
+\label{subsec:Solution}
+%%%%%%%%%%%%%%%%%%%%%%%
+
+The solution presented here only requires three steps to apply and provides all of the required
+configuration \emph{done} and validated by the examples in this document:
+
+\begin{enumerate}
+    \item set \texttt{biblatex} as the \emph{only} bibliography package in your .tex document, as
+          shown below:
+\begin{verbatim}
+    \usepackage[style=harvardagps]{biblatex}
+    \addbibresource{your.bib}
+    ...
+    \newpage
+    \printbibliography[heading=bibintoc]
+\end{verbatim}
+    \item place copies of \texttt{harvardagps.bbx} and \texttt{harvardagps.cbx} files, from this
+          repository, into the same directory as your .tex document.
+    \item start writing see: \refNameNum{subsec:UsingAutociteAndTextcite}.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Disclaimer}
+%%%%%%%%%%%%%%%%%%%%%%%
+
+This work is independent and has in no way been endorsed by the University of Southern Queensland.
+This work is provided `as is' under the stated license. The \texttt{agps.bib} file makes no claims
+about being an accurate bibliographic database - it's aim is to exactly match The Guide.
+
+%%%%%%%%%%%%%%%%%%%%
+\subsection{License}
+%%%%%%%%%%%%%%%%%%%%
+
+\begin{small}
+\begin{verbatim}
+Copyright 2024 Gavin Kromhout
+
+This work may be distributed and/or modified under the
+conditions of the LaTeX Project Public License, either version 1.3
+of this license or (at your option) any later version.
+The latest version of this license is in
+https://www.latex-project.org/lppl.txt
+and version 1.3c or later is part of all distributions of LaTeX
+version 2008 or later.
+
+This work has the LPPL maintenance status `maintained'.
+This work consists of all files listed in the repository.
+\end{verbatim}
+\end{small}
+
+%%%%%%%%%%%%%%%%%%%
+\subsection{Issues}
+%%%%%%%%%%%%%%%%%%%
+
+For any issues:
+
+\begin{enumerate}
+\item browse the source files in this repository - these files show complete examples with extensive comments;
+\item seek answers on the internet (of course);
+\item raise an issue against the GitHub repository, ideally with a minimal working example (MWE)
+that others can contribute to, and perhaps even include a suggested fix.
+\end{enumerate}
+
+Note well that any settings in a \texttt{biblatex.cfg} file will override the style settings.
+
+\medskip
+\noindent
+For reference, testing and implementation of this solution was performed with texlive (Debian)
+version: 2022.20230122-3; pdfTeX version: 3.141592653-2.6-1.40.24; \BibLaTeX\ version: v3.18b, and
+\texttt{biber} version: 2.18.
+
+According to the \texttt{biblatex} package manual \autocite[8]{LehmanEtAl2012biblatPackag},
+\BibLaTeX\ version: 3.18 is compatible with \texttt{biber} version: 2.18.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Alternatives}
+\label{subsec:Alternatives}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If all that is required is a working author-year referencing style, or if AGSM is specifically
+required, then consider the \texttt{harvard} package and the \texttt{agsm} style:
+
+\begin{verbatim}
+    \usepackage{harvard}
+    \bibliographystyle{agsm}
+\end{verbatim}
+
+Should the limitations of the above become unacceptable, or perhaps a suitable \texttt{natbib} style
+is immediately available, or the wide support of journals is required, then consider the
+\texttt{natbib} package and friends:
+
+\begin{verbatim}
+    \usepackage{natbib}
+    \usepackage{har2nat}
+    \bibliographystyle{agsm}
+\end{verbatim}
+
+Note also that if the document already contains \texttt{natbib} citation commands, and those
+commands should be preserved, for example to be able to easily switch back and forth, then
+\texttt{biblatex} load-time option \texttt{natbib=true} \emph{might} be useful to try the solution
+presented in this repository (not tested, contributions welcome).
+
+Finally, the above alternatives still require significant configuration and possibly the creation of
+a custom .bst style file to approach the Harvard AGPS referencing style, in fact that was initially
+the intent for this repository, instead for the greatest configurability consider \BibLaTeX\ as has
+been done in the solution presented here.
+
+%%%%%%%%%%%%%%%%%%
+\newpage
+\section{Examples}
+%%%%%%%%%%%%%%%%%%
+
+The aim of the Harvard AGPS \BibLaTeX\ Style is to exactly match the examples found in the
+\emph{University of Southern Queensland Harvard AGPS Referencing Guide}
+\autocite{UniSQ2020HarvarAGPSRefere}, henceforth The Guide.
+
+Note carefully that these examples are not a copy and paste from The Guide, they are completely
+generated from the \texttt{agps.bib} entries using the style files.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsectionRefSection{Using \texttt{autocite} and \texttt{textcite}}
+\label{subsec:UsingAutociteAndTextcite}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Using \verb|\autocite| and \verb|\textcite| as the base commands is the recommended approach for
+citation in a typical paper.
+
+\begin{agpsExample}
+
+    Example using \verb|\autocite{Smith1985MicroePolicyFramew}|:
+
+    \begin{bareList}
+        \item \ldots\ \autocite{Smith1985MicroePolicyFramew}.
+    \end{bareList}
+
+    Example using \verb|\autocite[65]{Smith1985MicroePolicyFramew}|:
+
+    \begin{bareList}
+        \item \ldots\ \autocite[65]{Smith1985MicroePolicyFramew}.
+    \end{bareList}
+
+    Example using \verb|\textcite{Smith1985MicroePolicyFramew}|:
+
+    \begin{bareList}
+        \item \textcite{Smith1985MicroePolicyFramew} \ldots
+    \end{bareList}
+
+    Example using \verb|\textcite[65-66]{Smith1985MicroePolicyFramew}|:
+
+    \begin{bareList}
+        \item \textcite[65-66]{Smith1985MicroePolicyFramew} \ldots
+    \end{bareList}
+
+\end{agpsExample}
+
+\printsubbibliographyEndRefSection
+
+\subsubsection{Reasoning}
+
+The reasoning for recommending this approach is, firstly, that the combination of \verb|\autocite|
+and \verb|\textcite| seem to be the most likely to just work and do the right thing when changing
+\BibLaTeX\ styles.
+
+In the Harvard \BibLaTeX\ AGPS Style \verb|\autocite| is already configured to use \verb|\parencite|
+so there is no need to use it directly and the former has the added advantage of being considered to
+be a style-independent command which is able to automatically switch styles whereas the latter
+should always be expected to wrap the whole citation in parentheses or square brackets, which may
+not be the right outcome for all referencing styles.
+
+Secondly, when switching to a completely different bibliography package, then \verb|\autocite|
+should be able to be replaced with the base citation command from that package with predictable
+results, and \verb|\textcite| can be replaced with the text/noun/subject equivalent from that
+package to provide the required outcome.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{(Not) Using \texttt{cite}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+This is a validation example only and \emph{not} recommended for creating citations in a typical
+paper. The \verb|\cite| command is described as a bare command by the \texttt{biblatex} package
+manual \autocite[110]{LehmanEtAl2012biblatPackag} and the Harvard \BibLaTeX\ AGPS style makes no
+attempt to change that. The bare output does \emph{not} provide a valid Harvard AGPS citation.
+
+\refsection
+
+\begin{agpsExample}
+
+    Example using \verb|\cite|:
+
+    \begin{bareList}
+        \item \cite{Smith1985MicroePolicyFramew}
+    \end{bareList}
+
+\end{agpsExample}
+
+\printsubbibliographyEndRefSection
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsectionRefSection{(Not) Using \texttt{fullcite}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+This is a validation example only and \emph{not} recommended for creating citations in a typical
+paper. Note that the full reference (aka full citation) is printed, at the citation location, using
+the reference list formatting, except in-text. This output does \emph{not} provide a valid Harvard
+AGPS in-text citation.
+
+\begin{agpsExample}
+
+    Example using \verb|\fullcite|:
+
+    \begin{bareList}
+        \item \fullcite{Smith1985MicroePolicyFramew} $\leftarrow$ no period as text is in-line.
+    \end{bareList}
+
+\end{agpsExample}
+
+\printsubbibliographyEndRefSection
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsectionRefSection{No Address}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An example for which the address is not clear in print materials. This example is `as seen' in The
+Guide. Since The Guide encourages terseness, on occasion, for the publisher address this style does
+not automatically insert the required \texttt{n.p.}\ abbreviation for `no place' in the reference
+list. This may be performed manually, where required, in the \texttt{.bib} file by setting
+\verb|Address = {n.p.}| on the entry.
+
+\begin{agpsExample}
+
+    Example:
+
+    \begin{bareList}
+        \item \ldots\ \autocite{SnooksCo2002StyleManualAuthor}.
+    \end{bareList}
+
+\end{agpsExample}
+
+\printsubbibliographyEndRefSection
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsectionRefSection{Single Author}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+This is a single author book example. Note how The Guide encourages being terse with the publisher
+address because it is already clear from the other details. Note also how a list of pages is
+specified and the plural for pages \texttt{pp.}\ is automatically inserted.
+
+\begin{agpsExample}
+
+    Example using \verb|\autocite[23,25]{Abbott2008CambriIntrodNarrat}|:
+
+    \begin{bareList}
+        \item \ldots\ \autocite[23,25]{Abbott2008CambriIntrodNarrat}.
+    \end{bareList}
+
+    Example using \verb|\textcite[23,25]{Abbott2008CambriIntrodNarrat}|:
+
+    \begin{bareList}
+        \item \textcite[23,25]{Abbott2008CambriIntrodNarrat} \ldots
+    \end{bareList}
+
+\end{agpsExample}
+
+\printsubbibliographyEndRefSection
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsectionRefSection{Two or Three Authors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{agpsExample}
+
+    Examples:
+
+    \begin{bareList}
+        \item \ldots\ \autocite[80]{KakadiaEtAl2004NetworConcepTechno}.
+        \item \textcite{KakadiaEtAl2004NetworConcepTechno} \ldots
+        \item \ldots\ \autocite{DouglasEtAl2009CitizeEngineHandbo}.
+        \item \textcite[11]{DouglasEtAl2009CitizeEngineHandbo} \ldots
+    \end{bareList}
+
+\end{agpsExample}
+
+\printsubbibliographyEndRefSection
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsectionRefSection{More Than Three Authors}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{agpsExample}
+
+    Examples:
+
+    \begin{bareList}
+        \item \ldots\ \autocite[54]{BeerEtAl2012ManagePublicServic} \ldots
+        \item \textcite[54]{BeerEtAl2012ManagePublicServic} \ldots
+    \end{bareList}
+
+\end{agpsExample}
+
+\printsubbibliographyEndRefSection
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsectionRefSection{Unknown Author}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{agpsExample}
+
+    Examples:
+
+    \begin{bareList}
+        \item \ldots\ \autocite[21-2]{StageAcquitBeing1996}.
+        \item \ldots\ \textcite[21-2]{StageAcquitBeing1996}.
+    \end{bareList}
+
+\end{agpsExample}
+
+\printsubbibliographyEndRefSection
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsectionRefSection{Corporate (Group) Author}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{agpsExample}
+
+    Examples:
+
+    \begin{bareList}
+        \item \ldots\ \textcite[2-3]{UrapunLandClaim2001} \ldots
+        \item \ldots\ \autocite[2-3]{UrapunLandClaim2001}.
+        \item \textcite[9]{PCSC1983QueensPlanniCommit} \ldots
+        \item \ldots\ \autocite[9]{PCSC1983QueensPlanniCommit}.
+        \item \autocite{OfficeoftheAboriginalLandCommissioner2001UrapunLandClaim}
+    \end{bareList}
+
+\end{agpsExample}
+
+\printsubbibliographyEndRefSection
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsectionRefSection{Multiple Works by Same Author}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The author name(s) of multiple works by exactly the same author(s) are replaced with 2 em-dashes in
+the reference list and the style is therefore able to automatically match The Guide exactly in this
+respect.  However, it would appear that repeated author name(s) when the overall work authorship is
+different (further/multiple authors are involved that differ from the previously listed work) are
+not so easily replaced with the current version of \BibLaTeX\ without resorting to high risk code in
+what needs to be a stable style. An automatic solution may need to wait for core \BibLaTeX\ support
+and/or more thorough testing. A manual workaround is possible as shown in the \texttt{agps.bib} file
+and the \texttt{ChaffeeEtAl2002CriticThinkiThough} entry using the \texttt{SortName},
+\texttt{ShortAuthor} field and a sprinkle of \LaTeX\ in the \texttt{Author} field to achieve an
+exact match to The Guide.
+
+\begin{agpsExample}
+
+    Examples:
+
+    \begin{bareList}
+        \item \ldots\ \autocite[215]{LyonEtAl2002Circus}.
+        \item \ldots\ \autocite[27]{LyonEtAl2002Clowns}.
+        \item \ldots\ \autocites[215]{LyonEtAl2002Circus}[27]{LyonEtAl2002Clowns}[19]{LyonEtAl2008NoFurtheInform}.
+        \item \textcites[215]{LyonEtAl2002Circus}[27]{LyonEtAl2002Clowns}[19]{LyonEtAl2008NoFurtheInform} \ldots
+        \item \ldots\ \autocite{ChaffeeEtAl2002CriticThinkiThough}.
+        \item \textcite{ChaffeeEtAl2002CriticThinkiThough} \ldots
+        \item \ldots \autocite{Chaffee1998ThinkeWay8, ChaffeeEtAl2002CriticThinkiThough, Chaffee1991ThinkiCritic}.
+    \end{bareList}
+
+\end{agpsExample}
+
+\nocite{Chaffee1991ThinkiCritic, Chaffee1998ThinkeWay8, ChaffeeEtAl2002CriticThinkiThough}%
+
+\printsubbibliographyEndRefSection
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsectionRefSection{Different Authors with Same Surname}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{agpsExample}
+
+    Examples:
+
+    \begin{bareList}
+        \item \ldots\ \textcite[12]{Smith1981TheoryMicroePolicy} \ldots\
+        \autocite[65]{Smith1985MicroePolicyFramew}.
+    \end{bareList}
+
+\end{agpsExample}
+
+\printsubbibliographyEndRefSection
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsectionRefSection{Edited Book/Collection}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{agpsExample}
+
+    Examples:
+
+    \begin{bareList}
+        \item \ldots\ \autocite[ed.][27]{Brofenbrenner2005MakingHumanBeings}.
+        \item \ldots\ edited by \autocite[27]{Brofenbrenner2005MakingHumanBeings}.
+    \end{bareList}
+
+\end{agpsExample}
+
+\printsubbibliographyEndRefSection
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsectionRefSection{Authors Citing Other Authors (Secondary Citation)}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{agpsExample}
+
+    Examples:
+
+    \begin{bareList}
+        \item Brown \autocite[cited in][99]{Smith1995FoodProcesTechno} \ldots
+        \item \ldots\ \autocite[Brown, cited in][99]{Smith1995FoodProcesTechno}.
+    \end{bareList}
+
+\end{agpsExample}
+
+\printsubbibliographyEndRefSection
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsectionRefSection{No Publication Date}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{agpsExample}
+
+    Examples:
+
+    \begin{bareList}
+        \item \ldots \autocite{CreativeCommonsNdShareYourWork}.
+        \item \citeauthor{LloydWebber1970JesusCSupers}'s \autocite*{LloydWebber1970JesusCSupers} \ldots
+        \item \textcite{LloydWebber1970JesusCSupers} \ldots
+        \item \ldots\ \autocite{LloydWebber1970JesusCSupers}
+    \end{bareList}
+
+\end{agpsExample}
+
+\printsubbibliographyEndRefSection
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsectionRefSection{Editions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{agpsExample}
+
+    Examples:
+
+    \begin{bareList}
+        \item \ldots\ \autocite[12]{Abbott2008CambriIntrodNarrat}.
+        \item \autocite[12]{Abbott2008CambriIntrodNarrat} \ldots
+    \end{bareList}
+
+\end{agpsExample}
+
+\printsubbibliographyEndRefSection
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsectionRefSection{Titles}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{agpsExample}
+
+    Example:
+
+    \begin{bareList}
+        \item \ldots\ \autocite[214-218]{Reichard2016DeadloDisillAmeric}.
+    \end{bareList}
+
+\end{agpsExample}
+
+\printsubbibliographyEndRefSection
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsectionRefSection{URLs}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{agpsExample}
+
+    Examples:
+
+    \begin{bareList}
+        \item \ldots\ \autocite{TheBodyShopAustralia2018BodyShopAustra}.
+        \item \ldots\ \citeauthor{TheBodyShopAustralia2018BodyShopAustra}
+        website \textless\citeurl{TheBodyShopAustralia2018BodyShopAustra}\textgreater.
+    \end{bareList}
+
+\end{agpsExample}
+
+\printsubbibliographyEndRefSection
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsectionRefSection{Books}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{agpsExample}
+
+    Examples:
+
+    \begin{bareList}
+        \item \Textcite[11]{DouglasEtAl2009CitizeEngineHandbo} \ldots
+        \item \ldots \autocite[27]{McClainEtAl1999SchaumQuickGuide}.
+        \item \ldots \autocite[36]{Ware2010CottagbySea}.
+    \end{bareList}
+
+\end{agpsExample}
+
+\printsubbibliographyEndRefSection
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsectionRefSection{Chapter in Edited Books, Including Dictionaries and Encyclopedias}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{agpsExample}
+
+    Examples:
+
+    \begin{bareList}
+        \item \ldots \autocite[255]{Brandt2002DefectNewborMorali}.
+        \item \ldots \autocite[26]{Gould2000MoreThingsHeaven}.
+        \item \ldots \autocite[5]{DaddsEtAl2004DiagnoIssues}.
+        \item \Textcite[334]{ConcisOxfordDictio1990} $\leftarrow$ using the \texttt{skipbib} option
+        in the entry prevents the entry from appearing in the reference list.
+    \end{bareList}
+
+\end{agpsExample}
+
+\printsubbibliographyEndRefSection
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsectionRefSection{Journal Articles, Newspaper Articles, Magazine Articles}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{agpsExample}
+
+    Examples:
+
+    \begin{bareList}
+        \item \Citeauthor{Wong2009RethinHobbitIndone}'s \citeyear{Wong2009RethinHobbitIndone}
+        \ldots\ \pnotecite[67-69]{Wong2009RethinHobbitIndone}.
+        \item \ldots\ \autocite[23-5]{Griffith1995CoordiFamilySchool}.
+        \item \ldots\ \autocite[23-5]{McCarthyEtAl2021DroneThermaRemote}.
+        \item \ldots\ \autocite[16-17]{JeffersEtAl2010RealitDrough}.
+        \item \ldots\ (\citetitle{WeekenAustra1987} 24-25 Jan. \citeyear[19]{WeekenAustra1987})
+        $\leftarrow$ using the \texttt{skipbib} option in the entry prevents the entry from
+        appearing in the reference list.
+        \item \Textcite{ClearyEtAl2001ItsEndLong} \ldots
+    \end{bareList}
+
+\end{agpsExample}
+
+\printsubbibliographyEndRefSection
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsectionRefSection{Website Home Page}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{agpsExample}
+
+    Examples:
+
+    \begin{bareList}
+        \item \ldots\ \textless\url{www.usq.edu.au}\textgreater.
+        \item \ldots\ \autocite{USQ2019UniverSoutheQueens}.
+    \end{bareList}
+
+\end{agpsExample}
+
+\printsubbibliographyEndRefSection
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsectionRefSection{Web Page}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{agpsExample}
+
+    Example:
+
+    \begin{bareList}
+        \item \ldots\ \autocite{TheBodyShopAustralia2018CorporSocialRespon}.
+    \end{bareList}
+
+\end{agpsExample}
+
+\printsubbibliographyEndRefSection
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsectionRefSection{Web Document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{agpsExample}
+
+    Example:
+
+    \begin{bareList}
+        \item \ldots\ \autocite{Anderson2000CASAApprovAvgas}.
+    \end{bareList}
+
+\end{agpsExample}
+
+\printsubbibliographyEndRefSection
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsectionRefSection{Published Papers}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{agpsExample}
+
+    Examples:
+
+    \begin{bareList}
+        \item \ldots\ \autocite[24]{Smith1996AcademOrientProgra}.
+        \item \Textcite[24]{Smith1996AcademOrientProgra} \ldots
+    \end{bareList}
+
+\end{agpsExample}
+
+\printsubbibliographyEndRefSection
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsectionRefSection{Unpublished Papers}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{agpsExample}
+
+    Example:
+
+    \begin{bareList}
+        \item \ldots\ \autocite{Pomfret2001EconomDiversNew}.
+    \end{bareList}
+
+\end{agpsExample}
+
+\printsubbibliographyEndRefSection
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsectionRefSection{Your Own Previous Assignment}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{agpsExample}
+
+    Example:
+
+    \begin{bareList}
+        \item \Textcite[45]{Smith2018Assign1} \ldots
+    \end{bareList}
+
+\end{agpsExample}
+
+\printsubbibliographyEndRefSection
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{Reference vs References}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+This style manual and test document (agps.tex) prints a Reference in each subsection to provide the
+examples. The \texttt{refsection} commands are used to effectively hide the citations from the
+actual reference list by placing them into a reference segment. \underline{Typically don't use this
+method in a paper}.
+
+Note carefully that, in the examples, this document is not citing anything from the example sources,
+merely providing citation and reference examples.
+
+Where citation and referencing is required, this document includes the required in-text citation and
+the full citation is listed in the single References section at the end of the paper as typically
+required by the Harvard AGPS style.
+
+%%%%%%%%%%%% References %%%%%%%%%%%%
+\newpage
+\printbibliography[heading=bibintoc]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% The End.
+\end{document}
